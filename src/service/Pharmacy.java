@@ -1,6 +1,9 @@
 package service;
 
 import com.model.Order;
+import job.BuyerStatsJob;
+import job.CashboxStatsJob;
+import job.WinnerJob;
 import util.PharmacyConst;
 
 import java.nio.file.Path;
@@ -19,7 +22,7 @@ public class Pharmacy  extends Thread {
 
     public Pharmacy(int buyersNumber, int cashboxesNumber) {
         this.executorService = Executors.newScheduledThreadPool(3);
-        this.allOrders = new ArrayBlockingQueue<>(cashboxesNumber * 10);
+        this.allOrders = new LinkedBlockingDeque<>(cashboxesNumber*10);
         this.buyers = createBuyers(buyersNumber);
         this.cashboxes = createCashboxes(cashboxesNumber);
     }
@@ -36,7 +39,7 @@ public class Pharmacy  extends Thread {
         executorService.scheduleAtFixedRate(new CashboxStatsJob(cashboxes, cashboxStatsPath), CASHBOX_STATS_JOB_PERIOD,CASHBOX_STATS_JOB_PERIOD, TimeUnit.SECONDS);
 
 
-        executorService.scheduleAtFixedRate(new WinnerJob (buyerStatsPath, cashboxStatsPath), WINNER_JOB_PERIOD,WINNER_JOB_PERIOD, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(new WinnerJob(buyerStatsPath, cashboxStatsPath), WINNER_JOB_PERIOD,WINNER_JOB_PERIOD, TimeUnit.SECONDS);
 
 
     }
